@@ -1,0 +1,1088 @@
+{
+  "openapi" : "3.0.0",
+  "x-eqx-api-linter-skip-rules" : [ 3, 24 ],
+  "info" : {
+    "title" : "User Management",
+    "description" : "Users API supports user management work flows for your organization. Users from your organization with the appropriate permissions may carry out work flows that include single user creation, deactivation and deletion, as well as user profile retrieval and update. The authorization token and content-type are the only headers that are passed to this API and a response is received based on the values passed.",
+    "version" : "R2022.10.01-CATALOG",
+    "termsOfService" : "https://www.equinix.com/about/legal/terms",
+    "contact" : {
+      "name" : "Equinix API Support",
+      "email" : "api-support@equinix.com"
+    }
+  },
+  "tags" : [ {
+    "name" : "User Management",
+    "description" : "User Management"
+  } ],
+  "servers" : [ {
+    "url" : "https://api.equinix.com/v1/usermanagement",
+    "x-name" : "Server1"
+  }, {
+    "url" : "https://sandboxapi.equinix.com/v1/usermanagement",
+    "x-name" : "Server2"
+  } ],
+  "paths" : {
+    "/access/v2/users" : {
+      "post" : {
+        "tags" : [ "User Management" ],
+        "summary" : "Create a users",
+        "operationId" : "Create a user",
+        "security" : [ {
+          "BearerAuth" : [ ]
+        } ],
+        "description" : "This method allows your organization to create a single user. This newly created user can be listed as a notification or technical contact in future requests.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/userCreations"
+              },
+              "example" : {
+                "username" : "john_doe",
+                "firstName" : "John",
+                "lastName" : "Doe",
+                "localName" : "ドー・ジョン",
+                "contactDetails" : [ {
+                  "type" : "PHONE",
+                  "value" : "+1-12312312300"
+                }, {
+                  "type" : "EMAIL",
+                  "value" : "johndoe@acme.com"
+                }, {
+                  "type" : "MOBILE",
+                  "value" : "+1-12312312300"
+                } ],
+                "companyName" : "Acme Corporation",
+                "companyLocalName" : "アクミ株式会社",
+                "title" : "Manager",
+                "department" : "Procurement",
+                "deactivationDateTime" : "2021-02-08T06:59:00.000Z",
+                "timezone" : "America/Los_Angeles",
+                "locale" : "EN_US"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "headers" : {
+              "Location" : {
+                "description" : "Location of user \"/users/john_doe1\"",
+                "schema" : {
+                  "type" : "string"
+                },
+                "example" : "/users/john_doe1"
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "examples" : {
+                  "single_field_error" : {
+                    "value" : [ {
+                      "errorCode" : "EQ-2021025",
+                      "errorMessage" : "Selected value is not in allowed list of values",
+                      "correlationId" : "99740113403329",
+                      "additionalInfo" : [ {
+                        "property" : "locale",
+                        "reason" : "Selected code is invalid. Allowed list are  EN_US, EN_GB",
+                        "value" : "EN"
+                      } ]
+                    } ]
+                  },
+                  "multiple_field_error" : {
+                    "value" : [ {
+                      "errorCode" : "EQ-2021010",
+                      "errorMessage" : "One or more property is having miss leading input fields/properties",
+                      "correlationId" : "99740129126918",
+                      "additionalInfo" : [ {
+                        "property" : "locale",
+                        "reason" : "Selected code is invalid. Allowed list are  EN_US, EN_GB",
+                        "value" : "EN"
+                      }, {
+                        "property" : "deactivationsDateTime",
+                        "reason" : "timestamp is invalid",
+                        "value" : "2020-06-18T06:41:10.562sdasZ"
+                      } ]
+                    } ]
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021006",
+                  "errorMessage" : "Permission denied to create. Please ensure you have appropriate permissions.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021030",
+                  "errorMessage" : "The server has encountered an unexpected error. We apologize for the inconvenience. Please try again later.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "get" : {
+        "tags" : [ "User Management" ],
+        "summary" : "Retrieve all the users",
+        "operationId" : "Retrieve all the users",
+        "security" : [ {
+          "BearerAuth" : [ ]
+        } ],
+        "description" : "This method retrieves a list of existing users in your organization based on the given parameters.",
+        "parameters" : [ {
+          "name" : "keyword",
+          "in" : "query",
+          "description" : "Search criteria supported fields username, legal first name,legal last name or email address (primary emails address)",
+          "example" : "johndoe@acme.com",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "The current status of the user. `TERMINATED` users are not returned by default",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "ACTIVE", "NEW", "APPROVED", "INACTIVE", "LOCKED", "TERMINATED" ]
+            }
+          }
+        }, {
+          "name" : "favoriteOnly",
+          "in" : "query",
+          "description" : "When `true`, search only the favourite users of the logged in user",
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "userRoles",
+          "in" : "query",
+          "description" : "User roles",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "USER", "MASTER_ADMIN", "IBX_ADMIN" ]
+            }
+          }
+        }, {
+          "name" : "sorts",
+          "in" : "query",
+          "description" : "Sort the users in the response in a particular order. For descending order, prefix the field name with '-'. For example, use 'FIRST_NAME' to sort the users by first name in ascending order and '-FIRST_NAME' for descending order. By default, the records are sorted according to descending user activation date",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "FIRST_NAME", "-FIRST_NAME", "LAST_NAME", "-LAST_NAME", "STATUS", "-STATUS", "EMAIL", "-EMAIL", "ROLE", "-ROLE" ]
+            }
+          }
+        }, {
+          "name" : "offset",
+          "in" : "query",
+          "description" : "Use `offset` to control the number of records to be skipped in the response.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "minimum" : 0,
+            "default" : 0
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Use `limit` to restrict the number of records in the response.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "minimum" : 1,
+            "maximum" : 100,
+            "default" : 10
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userSearchResponse"
+                },
+                "example" : {
+                  "data" : [ {
+                    "username" : "john_doe1",
+                    "firstName" : "John",
+                    "lastName" : "Doe",
+                    "email" : "johndoe@acme.com",
+                    "status" : "ACTIVE",
+                    "title" : "QA",
+                    "department" : "Quality",
+                    "securityProfile" : "COMPLETED",
+                    "userRole" : "MASTER_ADMIN",
+                    "isFavorite" : false,
+                    "createdDateTime" : "2021-02-08T06:59:00.000Z",
+                    "updatedDateTime" : "2021-02-08T06:59:00.000Z"
+                  } ],
+                  "pagination" : {
+                    "offset" : 0,
+                    "limit" : 10,
+                    "total" : 1,
+                    "next" : "/users?offset=100&limit=10",
+                    "previous" : "/users?offset=0&limit=100"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021005",
+                  "errorMessage" : "Username not found for this account. Please ensure you have the appropriate permissions to view this user",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021030",
+                  "errorMessage" : "The server has encountered an unexpected error. We apologize for the inconvenience. Please try again later.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access/v2/users/{username}" : {
+      "patch" : {
+        "tags" : [ "User Management" ],
+        "summary" : "Update a user",
+        "operationId" : "Update a user",
+        "description" : "This method allows your organization to update user profiles. Depending on their permissions, authenticated users may update only their own profiles or also other user profiles.",
+        "security" : [ {
+          "BearerAuth" : [ ]
+        } ],
+        "parameters" : [ {
+          "name" : "username",
+          "in" : "path",
+          "description" : "Username of existing user",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "example" : "john_doe1"
+          }
+        } ],
+        "requestBody" : {
+          "description" : "User profile details to be updated",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/userUpdateDetails"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "202" : {
+            "description" : "Accepted",
+            "headers" : {
+              "Location" : {
+                "description" : "Location of a users \"/user/john_doe1\"",
+                "schema" : {
+                  "type" : "string"
+                },
+                "example" : "/user/john_doe1"
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "examples" : {
+                  "single_field_error" : {
+                    "value" : [ {
+                      "errorCode" : "EQ-2021025",
+                      "errorMessage" : "Selected value is not in allowed list of values",
+                      "correlationId" : "99740113403329",
+                      "additionalInfo" : [ {
+                        "property" : "locale",
+                        "reason" : "Selected code is invalid. Allowed list are  EN_US, EN_GB, FR_FR, KO_KR",
+                        "value" : "EN"
+                      } ]
+                    } ]
+                  },
+                  "multiple_field_error" : {
+                    "value" : [ {
+                      "errorCode" : "EQ-2021010",
+                      "errorMessage" : "One or more property is having miss leading input fields/properties",
+                      "correlationId" : "99740129126918",
+                      "additionalInfo" : [ {
+                        "property" : "locale",
+                        "reason" : "Selected code is invalid. Allowed list are  EN_US, EN_GB, FR_FR, KO_KR",
+                        "value" : "EN"
+                      }, {
+                        "property" : "deactivationsDateTime",
+                        "reason" : "timestamp is invalid",
+                        "value" : "2020-06-18T06:41:10.562sdasZ"
+                      } ]
+                    } ]
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021007",
+                  "errorMessage" : "Username not found for this account. Please ensure you have the appropriate permissions to update this user",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021030",
+                  "errorMessage" : "The server has encountered an unexpected error. We apologize for the inconvenience. Please try again later.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "get" : {
+        "tags" : [ "User Management" ],
+        "summary" : "Retrieve user details",
+        "operationId" : "Retrieve user details",
+        "security" : [ {
+          "BearerAuth" : [ ]
+        } ],
+        "description" : "This method allows your organization to retrieve the profile details of any of your existing users by their username.",
+        "parameters" : [ {
+          "name" : "username",
+          "in" : "path",
+          "description" : "Username of existing user",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userReadDetails"
+                },
+                "example" : {
+                  "status" : "APPROVED",
+                  "username" : "john_doe1",
+                  "firstName" : "John",
+                  "lastName" : "Doe",
+                  "contactDetails" : [ {
+                    "type" : "PHONE",
+                    "value" : "+1-12312312300"
+                  }, {
+                    "type" : "EMAIL",
+                    "value" : "johndoe@acme.com"
+                  }, {
+                    "type" : "MOBILE",
+                    "value" : "+1-12312312300"
+                  } ],
+                  "companyName" : "Acme Corporation",
+                  "companyLocalName" : "アクミ株式会社",
+                  "title" : "Manager",
+                  "department" : "Procurement",
+                  "deactivationDateTime" : "2021-02-08T06:59:00.000Z",
+                  "timezone" : "America/Los_Angeles",
+                  "locale" : "EN_US"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021005",
+                  "errorMessage" : "Username not found for this account. Please ensure you have the appropriate permissions to view this user",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021030",
+                  "errorMessage" : "The server has encountered an unexpected error. We apologize for the inconvenience. Please try again later.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access/v2/users/accessChange" : {
+      "post" : {
+        "tags" : [ "User Management" ],
+        "summary" : "Terminate a user",
+        "operationId" : "Terminate a user",
+        "security" : [ {
+          "BearerAuth" : [ ]
+        } ],
+        "description" : "This method allows your organization to change the portal access of an existing user. This includes permanent termination which cannot be undone.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/userTerminationsRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "202" : {
+            "description" : "Accepted",
+            "headers" : {
+              "Location" : {
+                "description" : "Location of user request \"/users/john_doe1\"",
+                "schema" : {
+                  "type" : "string"
+                },
+                "example" : "/users/john_doe1"
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021008",
+                  "errorMessage" : "Delete operation is not allowed. Please ensure you have appropriate permissions.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021030",
+                  "errorMessage" : "The server has encountered an unexpected error. We apologize for the inconvenience. Please try again later.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access/v2/users/permissionsCopy" : {
+      "post" : {
+        "tags" : [ "User Management" ],
+        "summary" : "Copy user permissions",
+        "operationId" : "Copy user permissions",
+        "security" : [ {
+          "BearerAuth" : [ ]
+        } ],
+        "description" : "This method allows your organization to copy the permissions from a user to the target users",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/userPermissionsCopyRequest"
+              },
+              "example" : {
+                "sourceRegisteredUser" : "john_doe",
+                "targetRegisteredUsers" : [ "jane_doe" ]
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Ok",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/userPermissionsCopyResponse"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021008",
+                  "errorMessage" : "Permission denied to copy user permissions",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                },
+                "example" : [ {
+                  "errorCode" : "EQ-2021030",
+                  "errorMessage" : "Apologise for the inconvenience unfortunately unexpected exceptions has occurred.",
+                  "correlationId" : "99740129126918"
+                } ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "securitySchemes" : {
+      "BearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    },
+    "schemas" : {
+      "Error" : {
+        "title" : "Error Info",
+        "type" : "array",
+        "items" : {
+          "title" : "Error details",
+          "type" : "object",
+          "properties" : {
+            "errorCode" : {
+              "type" : "string",
+              "example" : "EQ-20YYXXX"
+            },
+            "errorMessage" : {
+              "type" : "string",
+              "example" : "Error message"
+            },
+            "details" : {
+              "type" : "string",
+              "example" : "Error details"
+            },
+            "correlationId" : {
+              "type" : "string",
+              "example" : "Correlation ID to trace the error back"
+            },
+            "help" : {
+              "type" : "string",
+              "example" : "URL to a help page for the corresponding errorCode"
+            },
+            "additionalInfo" : {
+              "title" : "Error details",
+              "type" : "object",
+              "properties" : {
+                "property" : {
+                  "type" : "string",
+                  "example" : "id"
+                },
+                "reason" : {
+                  "type" : "string",
+                  "example" : "missing id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "userUpdateDetails" : {
+        "title" : "Update",
+        "type" : "object",
+        "properties" : {
+          "firstName" : {
+            "type" : "string",
+            "description" : "Legal first name of the user.",
+            "example" : "John",
+            "maxLength" : 50
+          },
+          "lastName" : {
+            "type" : "string",
+            "description" : "Legal last name of the user.",
+            "example" : "Doe",
+            "maxLength" : 50
+          },
+          "localName" : {
+            "type" : "string",
+            "description" : "Legal local Name of the user",
+            "example" : "ドー・ジョン",
+            "maxLength" : 100
+          },
+          "contactDetails" : {
+            "type" : "array",
+            "description" : "Reference of the related party could be a party reference or a party role reference",
+            "minItems" : 2,
+            "maxItems" : 4,
+            "items" : {
+              "$ref" : "#/components/schemas/contactsDetails"
+            },
+            "example" : [ {
+              "type" : "PHONE",
+              "value" : "+1-4601231122"
+            }, {
+              "type" : "EMAIL",
+              "value" : "johndoe@acme.com"
+            }, {
+              "type" : "MOBILE",
+              "value" : "+1-4601231122"
+            } ]
+          },
+          "companyName" : {
+            "type" : "string",
+            "description" : "Company name of the user.",
+            "example" : "Acme Corporation",
+            "maxLength" : 100
+          },
+          "companyLocalName" : {
+            "type" : "string",
+            "description" : "Local company name of the user.",
+            "example" : "Acme Corporation",
+            "maxLength" : 100
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Job title of the user.",
+            "example" : "Manager",
+            "maxLength" : 50
+          },
+          "department" : {
+            "type" : "string",
+            "description" : "Business department of the user.",
+            "example" : "Procurement",
+            "maxLength" : 50
+          },
+          "deactivationDateTime" : {
+            "type" : "string",
+            "description" : "Future deactivation date and time.",
+            "example" : "2021-02-08T06:59:00.000Z",
+            "format" : "date-time"
+          },
+          "timezone" : {
+            "type" : "string",
+            "description" : "List of Equinix supported timezones.",
+            "example" : "America/Los_Angeles",
+            "enum" : [ "Atlantic/Canary", "Europe/Dublin", "Europe/London", "Europe/Lisbon", "Africa/Algiers", "Europe/Berlin", "Europe/Amsterdam", "Europe/Copenhagen", "Europe/Madrid", "Europe/Paris", "Europe/Stockholm", "Europe/Zurich", "Europe/Warsaw", "Africa/Cairo", "Africa/Johannesburg", "Europe/Sofia", "Africa/Nairobi", "Asia/Jerusalem", "Europe/Istanbul", "Europe/Moscow", "Asia/Riyadh", "Asia/Dubai", "Asia/Kabul", "Asia/Tehran", "Asia/Karachi", "Indian/Maldives", "Asia/Kolkata", "Asia/Kathmandu", "Asia/Omsk", "Asia/Rangoon", "Asia/Jakarta", "Asia/Ho_Chi_Minh", "Asia/Brunei", "Asia/Hong_Kong", "Asia/Kuala_Lumpur", "Asia/Manila", "Asia/Shanghai", "Asia/Singapore", "Asia/Taipei", "Australia/Perth", "Asia/Seoul", "Asia/Tokyo", "Australia/Darwin", "Australia/Brisbane", "Pacific/Guam", "Australia/Adelaide", "Australia/Sydney", "Pacific/Auckland", "Pacific/Chatham", "Indian/Christmas", "America/Scoresbysund", "Atlantic/South_Georgia", "America/Sao_Paulo", "America/Detroit", "America/New_York", "America/Puerto_Rico", "America/Toronto", "America/Bogota", "America/Chicago", "America/Winnipeg", "America/Denver", "America/Edmonton", "America/Mexico_City", "America/Los_Angeles", "America/Vancouver", "America/Phoenix", "America/Anchorage", "Pacific/Gambier", "Pacific/Marquesas", "Pacific/Honolulu", "Pacific/Fiji", "Asia/Muscat", "America/Argentina/Buenos_Aires", "America/Caracas", "Etc/GMT+12", "UTC", "GMT", "America/Santiago", "America/St_Johns", "Asia/Almaty", "Asia/Bangkok", "Asia/Calcutta", "Asia/Magadan", "Asia/Yekaterinburg", "Australia/Eucla", "Australia/Lord_Howe", "Europe/Bratislava", "Europe/Brussels", "Europe/Prague", "Europe/Rome", "Pacific/Kiritimati", "Pacific/Midway", "Pacific/Tongatapu", "Australia/Melbourne", "Australia/NSW", "Australia/Queensland", "Australia/South", "Australia/Victoria", "Australia/West", "Europe/Helsinki" ]
+          },
+          "locale" : {
+            "type" : "string",
+            "description" : "Preferred language for Equinix portal.",
+            "default" : "EN_US",
+            "enum" : [ "EN_US", "EN_GB", "FR_FR", "DE_DE", "NL_NL", "JA_JP", "ZH_CN", "PT_BR", "BG_BG", "RU_RU", "IT_IT", "PL_PL", "ES_ES", "ES_LA", "PT_PT", "TR_TR", "KO_KR" ]
+          }
+        },
+        "description" : "User information."
+      },
+      "userDetails" : {
+        "allOf" : [ {
+          "properties" : {
+            "username" : {
+              "type" : "string",
+              "description" : "Username to be registered.",
+              "example" : "john_doe1",
+              "minLength" : 8,
+              "maxLength" : 100
+            }
+          }
+        }, {
+          "$ref" : "#/components/schemas/userUpdateDetails"
+        }, {
+          "properties" : {
+            "activationDateTime" : {
+              "type" : "string",
+              "description" : "User activation date and time.",
+              "example" : "2021-02-08T06:59:00.000Z",
+              "format" : "date-time"
+            },
+            "createdDateTime" : {
+              "type" : "string",
+              "description" : "User created date and time.",
+              "example" : "2021-02-08T06:59:00.000Z",
+              "format" : "date-time"
+            },
+            "updatedDateTime" : {
+              "type" : "string",
+              "description" : "User updated date and time.",
+              "example" : "2021-02-08T06:59:00.000Z",
+              "format" : "date-time"
+            },
+            "updatedByFullName" : {
+              "type" : "string",
+              "description" : "Updated by first name and last name.",
+              "example" : "John Doe"
+            },
+            "deletedDateTime" : {
+              "type" : "string",
+              "description" : "User Termination date and time.",
+              "example" : "2021-02-08T06:59:00.000Z",
+              "format" : "date-time"
+            }
+          }
+        } ]
+      },
+      "userReadDetails" : {
+        "allOf" : [ {
+          "properties" : {
+            "status" : {
+              "type" : "string",
+              "description" : "User's status.",
+              "enum" : [ "ACTIVE", "NEW", "APPROVED", "INACTIVE", "LOCKED" ],
+              "example" : "ACTIVE"
+            }
+          }
+        }, {
+          "$ref" : "#/components/schemas/userDetails"
+        } ]
+      },
+      "contactsDetails" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "description" : "Communications Type",
+            "example" : "PHONE",
+            "enum" : [ "PHONE", "EMAIL", "SECONDARY_EMAIL", "MOBILE" ]
+          },
+          "value" : {
+            "type" : "string",
+            "description" : "Value of related `type`",
+            "example" : "+1-4601231122"
+          }
+        },
+        "description" : "Contact information."
+      },
+      "userCreations" : {
+        "title" : "Customer Account Creation",
+        "required" : [ "firstName", "lastName", "companyName", "contactDetails" ],
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/userDetails"
+        } ]
+      },
+      "userTerminationsRequest" : {
+        "type" : "object",
+        "required" : [ "id", "status", "action", "reason" ],
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Username for access to be changed. ",
+            "example" : "john_doe1"
+          },
+          "idType" : {
+            "type" : "string",
+            "description" : "type of `id`. Currently only `username` is supported.",
+            "enum" : [ "USERNAME" ],
+            "default" : "USERNAME"
+          },
+          "action" : {
+            "type" : "string",
+            "description" : "The type access change desired. Use `TERMINATE` to permanently remove access. ",
+            "enum" : [ "TERMINATE" ],
+            "example" : "TERMINATE"
+          },
+          "reason" : {
+            "type" : "string",
+            "description" : "Reason for access change.",
+            "example" : "user has been removed from account or organizations"
+          }
+        }
+      },
+      "userPermissionsCopyRequest" : {
+        "type" : "object",
+        "required" : [ "sourceRegisteredUser", "targetRegisteredUsers" ],
+        "properties" : {
+          "sourceRegisteredUser" : {
+            "type" : "string",
+            "description" : "username of the user where permission is copied from"
+          },
+          "targetRegisteredUsers" : {
+            "type" : "array",
+            "minItems" : 1,
+            "maxItems" : 1,
+            "items" : {
+              "type" : "string"
+            },
+            "description" : "Username of the users where permissions is copied to"
+          }
+        }
+      },
+      "userPermissionsCopyResponse" : {
+        "title" : "User Permission Copy Response",
+        "type" : "object",
+        "properties" : {
+          "successes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "description" : "Username of the user"
+            },
+            "description" : "List of username successful in copying the permissions",
+            "example" : [ "john_doe" ]
+          },
+          "failures" : {
+            "type" : "array",
+            "description" : "List of the failures",
+            "items" : {
+              "$ref" : "#/components/schemas/userPermissionsCopyFailureResponse"
+            }
+          }
+        }
+      },
+      "userPermissionsCopyFailureResponse" : {
+        "title" : "Copy Permission Failure Response",
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "description" : "Unique ID for the user",
+            "example" : "jane_doe"
+          },
+          "errors" : {
+            "type" : "array",
+            "description" : "List of the errors",
+            "items" : {
+              "$ref" : "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "userSearchDetails" : {
+        "title" : "User Details",
+        "type" : "object",
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "description" : "Username to be registered.",
+            "example" : "john_doe"
+          },
+          "firstName" : {
+            "type" : "string",
+            "description" : "Legal first name of the user.",
+            "example" : "John"
+          },
+          "lastName" : {
+            "type" : "string",
+            "description" : "Legal last name of the user.",
+            "example" : "Doe"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "Email address",
+            "example" : "johndoe@acme.com"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "User's status.",
+            "enum" : [ "ACTIVE", "NEW", "APPROVED", "INACTIVE", "LOCKED" ],
+            "example" : "ACTIVE"
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Job title of the user",
+            "example" : "Manager"
+          },
+          "department" : {
+            "type" : "string",
+            "description" : "Business department of the user",
+            "example" : "Procurement"
+          },
+          "securityProfile" : {
+            "type" : "string",
+            "description" : "Status of user's security profile ",
+            "enum" : [ "COMPLETED", "NOT_COMPLETED", "NOT_APPLICABLE" ]
+          },
+          "userRole" : {
+            "type" : "string",
+            "description" : "Type of user role.",
+            "enum" : [ "USER", "MASTER_ADMIN", "IBX_ADMIN" ]
+          },
+          "isFavorite" : {
+            "type" : "boolean",
+            "description" : "When `true`, user is marked as favorite"
+          },
+          "deactivationDateTime" : {
+            "type" : "string",
+            "description" : "Future deactivation date and time.",
+            "example" : "2021-02-08T06:59:00.000Z",
+            "format" : "date-time"
+          },
+          "activationDateTime" : {
+            "type" : "string",
+            "description" : "User activation date and time.",
+            "example" : "2021-02-08T06:59:00.000Z",
+            "format" : "date-time"
+          },
+          "deletedDateTime" : {
+            "type" : "string",
+            "description" : "User Termination date and time.",
+            "example" : "2021-02-08T06:59:00.000Z",
+            "format" : "date-time"
+          },
+          "createdDateTime" : {
+            "type" : "string",
+            "description" : "User created date and time.",
+            "example" : "2021-02-08T06:59:00.000Z",
+            "format" : "date-time"
+          },
+          "updatedDateTime" : {
+            "type" : "string",
+            "description" : "User updated date and time.",
+            "example" : "2021-02-08T06:59:00.000Z",
+            "format" : "date-time"
+          }
+        },
+        "description" : "User information."
+      },
+      "userSearchResponse" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/userSearchDetails"
+            }
+          },
+          "pagination" : {
+            "$ref" : "#/components/schemas/pagination"
+          }
+        }
+      },
+      "pagination" : {
+        "type" : "object",
+        "properties" : {
+          "offset" : {
+            "type" : "integer",
+            "example" : 0
+          },
+          "limit" : {
+            "type" : "integer",
+            "example" : 25
+          },
+          "total" : {
+            "type" : "integer",
+            "example" : 100
+          },
+          "next" : {
+            "type" : "string",
+            "example" : "/users?offset=25&limit=25"
+          },
+          "previous" : {
+            "type" : "string",
+            "example" : "/users?offset=0&limit=25"
+          }
+        },
+        "description" : "Pagination"
+      }
+    }
+  },
+  "security" : [ ],
+  "x-mock" : true,
+  "x-metadata" : {
+    "metadata" : {
+      "swaggerName" : "aa554937d2db497691e68049d6f40de8",
+      "revision" : 1,
+      "documentation" : [ ],
+      "category" : [ {
+        "name" : "Unsorted",
+        "paths" : [ "/access/v2/users", "/access/v2/users/{username}", "/access/v2/users/accessChange", "/access/v2/users/permissionsCopy" ]
+      } ]
+    }
+  }
+}
