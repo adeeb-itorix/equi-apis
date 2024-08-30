@@ -729,7 +729,8 @@
           "required" : true,
           "schema" : {
             "type" : "string"
-          }
+          },
+          "style" : "simple"
         }, {
           "name" : "isNetNewCustomerFlag",
           "in" : "query",
@@ -738,7 +739,8 @@
           "schema" : {
             "type" : "boolean",
             "default" : false
-          }
+          },
+          "style" : "form"
         }, {
           "name" : "isCrhEnabledRequested",
           "in" : "query",
@@ -747,7 +749,8 @@
           "schema" : {
             "type" : "boolean",
             "default" : false
-          }
+          },
+          "style" : "form"
         } ],
         "requestBody" : {
           "$ref" : "#/components/requestBodies/productToggleRequest"
@@ -827,7 +830,8 @@
             }
           }
         },
-        "deprecated" : false
+        "deprecated" : false,
+        "operationId" : "Organizationproducttoggle"
       }
     },
     "/resourceManager/v1/{custOrgId}/inbox" : {
