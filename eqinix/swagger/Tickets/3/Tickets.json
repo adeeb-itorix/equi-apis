@@ -117,7 +117,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated" : true
       }
     },
     "/v2/tickets/{id}" : {
