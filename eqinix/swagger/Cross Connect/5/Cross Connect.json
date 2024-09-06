@@ -17,6 +17,12 @@
   }, {
     "url" : "https://sandboxapi.equinix.com/v1/crossconnect",
     "x-name" : "Server2"
+  }, {
+    "x-name" : "virtualhost",
+    "x-schema" : "https://",
+    "x-hostName" : "equi-poc-qezn.apiwiz.io",
+    "url" : "https://equi-poc-qezn.apiwiz.io/v1/crossconnect",
+    "x-basePath" : "/v1/crossconnect"
   } ],
   "tags" : [ {
     "name" : "Cross Connects",
