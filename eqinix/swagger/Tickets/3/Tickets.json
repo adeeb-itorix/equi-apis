@@ -31,6 +31,10 @@
   "paths" : {
     "/v2/tickets" : {
       "post" : {
+        "x-monitoring-stats" : {
+          "monitoringId" : "111",
+          "envId" : "222"
+        },
         "tags" : [ "Tickets" ],
         "summary" : "Create a Ticket",
         "operationId" : "Create a Ticket",
@@ -123,6 +127,10 @@
     },
     "/v2/tickets/{id}" : {
       "get" : {
+        "x-monitoring-stats" : {
+          "monitoringId" : "111",
+          "envId" : "222"
+        },
         "tags" : [ "Tickets" ],
         "summary" : "Retrieve a ticket",
         "operationId" : "Retrieve a ticket",
@@ -178,7 +186,6 @@
                       "type" : "PHONE"
                     } ]
                   }, {
-                    "registeredUser" : null,
                     "firstName" : "John",
                     "lastName" : "Doe",
                     "type" : "TECHNICAL",
@@ -263,9 +270,14 @@
               }
             }
           }
-        }
+        },
+        "deprecated" : true
       },
       "patch" : {
+        "x-monitoring-stats" : {
+          "monitoringId" : "111",
+          "envId" : "222"
+        },
         "tags" : [ "Tickets" ],
         "operationId" : "Update a ticket",
         "summary" : "Update a Ticket",
@@ -376,6 +388,10 @@
     },
     "/v2/tickets/{id}/notes" : {
       "post" : {
+        "x-monitoring-stats" : {
+          "monitoringId" : "111",
+          "envId" : "222"
+        },
         "tags" : [ "Tickets" ],
         "operationId" : "Add notes to ticket",
         "summary" : "Add notes to ticket",
@@ -486,6 +502,10 @@
     },
     "/v2/tickets/{id}/cancel" : {
       "post" : {
+        "x-monitoring-stats" : {
+          "monitoringId" : "111",
+          "envId" : "222"
+        },
         "tags" : [ "Tickets" ],
         "operationId" : "Cancel a ticket",
         "summary" : "Cancel a ticket",
