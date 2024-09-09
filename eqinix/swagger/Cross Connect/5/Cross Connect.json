@@ -382,6 +382,10 @@
     },
     "/colocations/v2/orders/crossConnects/{orderId}" : {
       "patch" : {
+        "x-monitoring-stats" : {
+          "monitoringId" : "111",
+          "envId" : "222"
+        },
         "tags" : [ "Cross Connects" ],
         "operationId" : "Update a Cross Connect Order",
         "summary" : "Update a cross connects order",
@@ -508,6 +512,10 @@
     },
     "/colocations/v2/orders/crossConnects/deinstall" : {
       "post" : {
+        "x-monitoring-stats" : {
+          "monitoringId" : "111",
+          "envId" : "222"
+        },
         "tags" : [ "Cross Connects" ],
         "summary" : "Place cross connect deinstallation order",
         "description" : "This API allows user to initiate a cross connect deinstallation request. Cross connect asset will be removed according to order placed.",
